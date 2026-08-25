@@ -1,0 +1,101 @@
+{
+  "_notes": "Hand-labeled these myself by pulling clauses from a mix of the sample contract plus a few real-ish templates I found online and rewrote to avoid copying anything verbatim. Started with ~15, added more over a few days whenever I noticed the classifier getting something wrong. Not huge but enough to sanity-check accuracy isn't garbage. Will keep adding to this.",
+
+  "clause_classification": [
+    {
+      "text": "The Client may terminate this Agreement at any time without notice and at its sole discretion, for any reason or no reason at all.",
+      "label": "Termination Clause"
+    },
+    {
+      "text": "The Contractor may terminate this Agreement only upon 60 days written notice to the Client.",
+      "label": "Termination Clause"
+    },
+    {
+      "text": "Either party may terminate this Agreement immediately upon written notice if the other party commits a material breach that remains uncured for 15 days.",
+      "label": "Termination Clause"
+    },
+    {
+      "text": "The Contractor's total liability under this Agreement shall be limited to the fees paid in the preceding 3 months.",
+      "label": "Liability Clause"
+    },
+    {
+      "text": "In no event shall either party be liable for indirect, incidental, or consequential damages arising out of this Agreement.",
+      "label": "Liability Clause"
+    },
+    {
+      "text": "The Client shall pay the Contractor a total fee of $45,000, payable in three installments of $15,000 each.",
+      "label": "Payment Terms"
+    },
+    {
+      "text": "Invoices are due within 30 days of receipt. Late payments shall accrue interest at 1.5% per month on the outstanding balance.",
+      "label": "Payment Terms"
+    },
+    {
+      "text": "Each party agrees to keep confidential all proprietary information disclosed by the other party during the term of this Agreement and for a period of 5 years thereafter.",
+      "label": "Confidentiality Clause"
+    },
+    {
+      "text": "Neither party shall disclose the terms of this Agreement to any third party without the prior written consent of the other party.",
+      "label": "Confidentiality Clause"
+    },
+    {
+      "text": "The Client agrees to indemnify and hold harmless the Contractor from any claims arising from the Client's misuse of deliverables.",
+      "label": "Indemnification Clause"
+    },
+    {
+      "text": "Each party shall indemnify the other against any third-party claims resulting from its own negligence or willful misconduct.",
+      "label": "Indemnification Clause"
+    },
+    {
+      "text": "This Agreement shall be governed by and construed in accordance with the laws of the State of Delaware, without regard to its conflict of law principles.",
+      "label": "Governing Law"
+    },
+    {
+      "text": "This Agreement and any disputes arising from it shall be governed by the laws of India, and the courts of Bangalore shall have exclusive jurisdiction.",
+      "label": "Governing Law"
+    },
+    {
+      "text": "Neither party shall be liable for delays or failure to perform due to causes beyond their reasonable control, including natural disasters, government actions, or labor disputes.",
+      "label": "Force Majeure"
+    },
+    {
+      "text": "During the term of this Agreement and for a period of 2 years following its termination, the Contractor agrees not to provide similar services to any direct competitor of the Client.",
+      "label": "Non-Compete Clause"
+    },
+    {
+      "text": "Any disputes arising out of or relating to this Agreement shall first be attempted to be resolved through good-faith negotiation between the parties.",
+      "label": "Dispute Resolution"
+    },
+    {
+      "text": "If unresolved within 30 days, disputes shall be submitted to binding arbitration in Wilmington, Delaware.",
+      "label": "Dispute Resolution"
+    },
+    {
+      "text": "This Agreement constitutes the entire understanding between the parties and supersedes all prior negotiations, representations, or agreements.",
+      "label": "General / Other"
+    },
+    {
+      "text": "Any notice required under this Agreement shall be sent in writing to the addresses listed in Exhibit B.",
+      "label": "General / Other"
+    },
+    {
+      "text": "All work product created by the Contractor under this Agreement shall be the sole and exclusive property of the Client upon full payment.",
+      "label": "General / Other"
+    }
+  ],
+
+  "summarization": [
+    {
+      "text": "This Agreement shall remain in effect for 6 months from the effective date unless terminated earlier. The Client may terminate this Agreement at any time without notice and at its sole discretion. The Contractor may terminate this Agreement only upon 60 days written notice to the Client.",
+      "reference_summary": "The contract lasts 6 months. The Client can end it anytime without notice, but the Contractor must give 60 days notice to end it."
+    },
+    {
+      "text": "The Client shall pay the Contractor a total fee of $45,000, payable in three installments of $15,000 each, due on the 1st of every month for three consecutive months. Late payments not received within 10 days of the due date shall accrue interest at 2% per month.",
+      "reference_summary": "The Client pays $45,000 in three monthly installments of $15,000. Late payments incur 2% monthly interest after a 10-day grace period."
+    },
+    {
+      "text": "Each party agrees to keep confidential all proprietary information disclosed by the other party during the term of this Agreement and for a period of 5 years thereafter. Confidential information shall not include information that is publicly available or independently developed.",
+      "reference_summary": "Both parties must keep shared confidential information secret for 5 years after the agreement ends, unless that information is already public."
+    }
+  ]
+}

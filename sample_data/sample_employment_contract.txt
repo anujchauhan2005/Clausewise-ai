@@ -1,0 +1,49 @@
+EMPLOYMENT AGREEMENT
+
+This Employment Agreement ("Agreement") is made between Solvix Analytics Pvt. Ltd., a company headquartered in Pune, India ("Company"), and Rohan Malhotra ("Employee"), effective from April 1, 2026.
+
+1. Position and Duties
+The Employee shall serve as Senior Data Scientist and shall report to the Head of Engineering. The Employee agrees to devote full working time and attention to the Company's business and shall not engage in any other employment without prior written consent from the Company.
+
+2. Compensation
+The Company shall pay the Employee a base salary of Rs. 18,00,000 per annum, payable monthly. The Employee shall also be eligible for an annual performance bonus of up to 15% of base salary, at the sole discretion of the Company's management, which may be withheld or reduced for any reason without explanation.
+
+3. Probation Period
+The Employee shall be on probation for the first 6 months of employment. During the probation period, the Company may terminate this Agreement at any time without notice and without cause, at its sole and absolute discretion.
+
+4. Working Hours and Leave
+The Employee shall work 45 hours per week, Monday through Friday. The Employee shall be entitled to 18 days of paid annual leave, 10 days of sick leave, and standard national holidays as per Company policy.
+
+5. Confidentiality
+The Employee agrees to keep confidential all trade secrets, client information, and proprietary business information of the Company, both during and after employment, for an indefinite period following termination, regardless of the reason for termination.
+
+6. Non-Compete and Non-Solicitation
+For a period of 3 years following termination of employment, for any reason, the Employee shall not work for, consult with, or hold any ownership interest in any company that competes with the Company anywhere in India. The Employee shall also not solicit any Company client or employee during this period.
+
+7. Intellectual Property
+All inventions, software, models, algorithms, and work product created by the Employee during employment, whether or not during working hours, shall be the sole and exclusive property of the Company. The Employee irrevocably waives all rights, including moral rights, to any such work product.
+
+8. Termination
+The Company may terminate this Agreement at any time, with or without cause, upon 30 days written notice or payment in lieu of notice, at the Company's sole discretion. The Employee must provide 60 days written notice to resign.
+
+9. Severance
+In the event of termination without cause after the probation period, the Employee shall be entitled to severance pay equal to one month's salary for each completed year of service, capped at a maximum of 3 months' salary regardless of tenure.
+
+10. Indemnification
+The Employee agrees to indemnify and hold harmless the Company from any and all claims, damages, or liabilities arising from the Employee's actions or omissions during the course of employment, including gross negligence.
+
+11. Governing Law and Dispute Resolution
+This Agreement shall be governed by the laws of India. Any disputes shall be subject to the exclusive jurisdiction of the courts in Pune, Maharashtra.
+
+12. Entire Agreement
+This Agreement, together with the Company's Employee Handbook, constitutes the entire agreement between the parties and supersedes all prior discussions, negotiations, and agreements relating to the Employee's employment.
+
+IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first written above.
+
+For Solvix Analytics Pvt. Ltd.
+Signature: ___________________
+Date: April 1, 2026
+
+Employee
+Signature: ___________________
+Date: April 1, 2026

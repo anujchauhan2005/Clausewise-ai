@@ -1,0 +1,25 @@
+# python
+__pycache__/
+*.pyc
+venv/
+env/
+*.egg-info/
+
+# env files - never commit actual keys
+.env
+
+# ide junk
+.vscode/
+.idea/
+*.swp
+
+# os junk
+.DS_Store
+Thumbs.db
+
+# model caches - these get huge, don't want them in git
+.cache/
+*.bin
+
+# chroma persistence if it ever gets switched from in-memory
+chroma_db/

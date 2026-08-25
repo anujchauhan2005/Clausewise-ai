@@ -1,0 +1,49 @@
+SERVICE AGREEMENT
+
+This Service Agreement ("Agreement") is entered into between Brightline Technologies Pvt. Ltd., having its registered office in Bangalore, India ("Client"), and Nexora Consulting Services LLC, a company based in Austin, Texas ("Contractor"), effective as of the date of last signature below.
+
+1. Scope of Services
+The Contractor agrees to provide software development and consulting services as described in Exhibit A. Any changes to scope must be agreed in writing by both parties.
+
+2. Payment Terms
+The Client shall pay the Contractor a total fee of $45,000, payable in three installments of $15,000 each, due on the 1st of every month for three consecutive months. Late payments not received within 10 days of the due date shall accrue interest at 2% per month. All payments made under this Agreement are non-refundable once services for the relevant milestone have commenced.
+
+3. Term and Termination
+This Agreement shall remain in effect for 6 months from the effective date unless terminated earlier. The Client may terminate this Agreement at any time without notice and at its sole discretion, for any reason or no reason at all. The Contractor may terminate this Agreement only upon 60 days written notice to the Client.
+
+4. Confidentiality
+Each party agrees to keep confidential all proprietary information disclosed by the other party during the term of this Agreement and for a period of 5 years thereafter. Confidential information shall not include information that is publicly available or independently developed.
+
+5. Limitation of Liability
+The Contractor's total liability under this Agreement, whether in contract, tort, or otherwise, shall be limited to the fees paid in the preceding 3 months. The Client agrees to indemnify and hold harmless the Contractor from any claims arising from the Client's misuse of deliverables. Notwithstanding the foregoing, the Client shall have unlimited liability for any breach of the confidentiality provisions in Section 4.
+
+6. Intellectual Property
+All work product created by the Contractor under this Agreement shall be the sole and exclusive property of the Client upon full payment. The Contractor waives any right to claim ownership over deliverables once payment has been received in full.
+
+7. Non-Compete
+During the term of this Agreement and for a period of 2 years following its termination, the Contractor agrees not to provide similar services to any direct competitor of the Client operating within the same industry vertical.
+
+8. Force Majeure
+Neither party shall be liable for delays or failure to perform due to causes beyond their reasonable control, including natural disasters, government actions, or labor disputes, provided the affected party gives prompt notice to the other party.
+
+9. Governing Law
+This Agreement shall be governed by and construed in accordance with the laws of the State of Delaware, without regard to its conflict of law principles.
+
+10. Dispute Resolution
+Any disputes arising out of or relating to this Agreement shall first be attempted to be resolved through good-faith negotiation between the parties. If unresolved within 30 days, disputes shall be submitted to binding arbitration in Wilmington, Delaware.
+
+11. Auto-Renewal
+This Agreement shall automatically renew for successive 6-month terms unless either party provides written notice of non-renewal at least 15 days prior to the end of the then-current term.
+
+12. Entire Agreement
+This Agreement constitutes the entire understanding between the parties and supersedes all prior negotiations, representations, or agreements, whether written or oral, relating to its subject matter.
+
+IN WITNESS WHEREOF, the parties have executed this Agreement as of the dates set forth below.
+
+For Brightline Technologies Pvt. Ltd.
+Signature: ___________________
+Date: March 3, 2026
+
+For Nexora Consulting Services LLC
+Signature: ___________________
+Date: March 3, 2026
