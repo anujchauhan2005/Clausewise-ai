@@ -1,6 +1,6 @@
 # 📜 ClauseWise — Legal Document Intelligence System
 
-**Turns dense legal/financial contracts into plain-English insights, automatically.**
+**Turns dense legal/financial contracts into plain-English insights, automatically.**                               
 
 ClauseWise takes a contract (loan agreement, employment contract, NDA, lease, etc.) and:
 - 🏷️ **Classifies every clause** into categories (Termination, Liability, Payment Terms, Confidentiality, etc.) using zero-shot NLP classification
