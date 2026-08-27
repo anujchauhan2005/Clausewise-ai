@@ -7,7 +7,7 @@ ClauseWise takes a contract (loan agreement, employment contract, NDA, lease, et
 - 🔍 **Extracts key entities** — money amounts, dates, durations, parties — using Named Entity Recognition
 - ⚠️ **Flags risky/unusual clauses** (e.g. unlimited liability, unilateral termination, auto-renewal traps)
 - 📝 **Summarizes the whole document** in plain English using an abstractive summarization model
-- 💬 **Answers questions about the document** using Retrieval-Augmented Generation (RAG)
+- 💬 **Answers questions about the document** using Retrieval-Augmented Generation (RAG)       
 
 Built to demonstrate applied NLP across the full stack — not just a single Jupyter notebook model.
 
