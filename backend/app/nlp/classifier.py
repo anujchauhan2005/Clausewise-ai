@@ -1,17 +1,9 @@
-"""
+﻿"""
 classifier.py
 
 Splits a contract into clause-sized chunks and tags each one with a
 category (Termination, Liability, Payment Terms etc.) using zero-shot
 classification.
-
-Went back and forth on this - originally wanted to fine-tune a proper
-classifier on LegalBERT but didn't have a labeled dataset big enough to
-make that worthwhile for v1. Zero-shot with bart-large-mnli gets
-surprisingly decent results on clause-level text since the categories
-are fairly distinct semantically. Fine-tuning is on the roadmap once
-I've got more labeled examples (see eval_dataset.json - been adding to
-it manually as I test).
 
 NOTE (updated): this used to load the model locally via
 transformers.pipeline(). On a 512MB-RAM host (Render free tier), that
@@ -32,10 +24,6 @@ CLASSIFIER_MODEL = os.getenv("CLASSIFIER_MODEL", "valhalla/distilbart-mnli-12-3"
 # faster/lighter with only a small accuracy tradeoff - fine for a demo.
 # Set CLASSIFIER_MODEL in .env if you want to swap models.
 
-# these are the categories I settled on after looking at ~10 different
-# contract types (NDAs, employment, loan agreements, leases). Could
-# probably add more granular ones later (e.g. splitting "Payment Terms"
-# into "Late Fees" / "Payment Schedule") but this is a reasonable start
 CLAUSE_LABELS = [
     "Termination Clause",
     "Liability Clause",
@@ -51,24 +39,14 @@ CLAUSE_LABELS = [
 
 
 def split_into_clauses(text: str) -> list:
-    """
-    Contracts don't come with clean paragraph breaks half the time, so
-    this splits on numbered sections (1., 2., Section 3, Article IV etc.)
-    first, and falls back to plain paragraph splitting if none of those
-    patterns match anything.
-    """
-    # matches things like "1.", "2.1", "Section 3", "Article IV", "(a)"
     section_pattern = re.compile(
         r"\n(?=\s*(?:\d+\.\d*|\(?[a-zA-Z]\)|Section \d+|Article [IVXLC]+)\s)"
     )
     chunks = section_pattern.split(text)
 
     if len(chunks) <= 1:
-        # fallback - just split on blank lines
         chunks = [p for p in text.split("\n\n") if p.strip()]
 
-    # filter out tiny fragments (headers, page numbers, stray whitespace)
-    # anything under ~25 chars is basically never a real clause
     clauses = [c.strip() for c in chunks if len(c.strip()) > 25]
 
     return clauses
@@ -85,10 +63,25 @@ def _classify_via_api(clause_text: str) -> dict:
         },
     )
 
+    # NOTE (updated): the old Inference API returned a dict shaped like
+    # {"labels": [...], "scores": [...]}. The new router (Inference
+    # Providers) returns a list of {"label": ..., "score": ...} objects,
+    # already sorted highest-score-first - confirmed via a real
+    # TypeError in production when this still assumed the old dict shape.
+    # Handling both here so this doesn't break again if it changes back.
+    if isinstance(result, dict) and "labels" in result:
+        top_label = result["labels"][0]
+        top_score = result["scores"][0]
+        runner_up = result["labels"][1] if len(result["labels"]) > 1 else None
+    else:
+        top_label = result[0]["label"]
+        top_score = result[0]["score"]
+        runner_up = result[1]["label"] if len(result) > 1 else None
+
     return {
-        "label": result["labels"][0],
-        "confidence": round(result["scores"][0], 4),
-        "runner_up": result["labels"][1] if len(result["labels"]) > 1 else None,
+        "label": top_label,
+        "confidence": round(top_score, 4),
+        "runner_up": runner_up,
     }
 
 
@@ -97,14 +90,6 @@ def classify_clause(clause_text: str) -> dict:
 
 
 def _classify_batch(clauses: list) -> list:
-    """
-    NOTE (updated): the local transformers pipeline used to batch these
-    internally for a speed win. The hosted Inference API doesn't give us
-    that same control, so this now calls the API once per clause. Each
-    call is a lightweight HTTP request rather than a local forward pass,
-    so this trades a bit of latency for not crashing the host - a fine
-    trade for a demo app.
-    """
     results = []
     for clause in clauses:
         classification = _classify_via_api(clause)
@@ -118,16 +103,6 @@ def _classify_batch(clauses: list) -> list:
 
 
 def classify_document(text: str, max_clauses: int = 60) -> dict:
-    """
-    Returns both the classified clauses and a flag for whether we had to
-    truncate. Added the max_clauses cap after testing this with a large
-    (6MB+) document - classifying thousands of clauses one at a time
-    just isn't going to finish in any reasonable amount of time for a
-    live demo. 60 clauses covers pretty much any real contract anyone
-    would realistically upload to try this out; genuinely huge documents
-    would need batched/async processing, which is out of scope for what
-    this project is trying to demonstrate.
-    """
     clauses = split_into_clauses(text)
     truncated = len(clauses) > max_clauses
     clauses_to_process = clauses[:max_clauses]
