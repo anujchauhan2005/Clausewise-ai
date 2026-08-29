@@ -1,4 +1,4 @@
-﻿"""
+"""
 hf_client.py
 
 Small shared helper for calling the Hugging Face Inference API instead
@@ -54,7 +54,7 @@ def query(model: str, payload: dict, pipeline: str = None) -> dict:
         )
 
     if pipeline:
-        url = f"https://router.huggingface.co/hf-inference/pipeline/{pipeline}/{model}"
+        url = f"https://router.huggingface.co/hf-inference/models/{model}/pipeline/{pipeline}"
     else:
         url = HF_API_URL.format(model=model)
 
