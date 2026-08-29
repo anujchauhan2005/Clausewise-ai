@@ -21,7 +21,11 @@ import time
 import requests
 
 HF_API_TOKEN = os.getenv("HF_API_TOKEN", "")
-HF_API_URL = "https://api-inference.huggingface.co/models/{model}"
+# NOTE (updated): Hugging Face permanently retired api-inference.huggingface.co
+# in favor of a new "Inference Providers" router. The old domain no longer
+# resolves at all (confirmed via a DNS resolution failure in production).
+# This is the new equivalent path for routing to HF's own inference backend.
+HF_API_URL = "https://router.huggingface.co/hf-inference/models/{model}"
 
 # serverless HF models "cold start" the first time they're hit after a
 # period of inactivity - the API returns a 503 with an estimated_time
