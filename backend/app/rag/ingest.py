@@ -1,4 +1,4 @@
-"""
+﻿"""
 ingest.py
 
 Takes the raw document text, chunks it, embeds it, and stores it in a
@@ -59,6 +59,7 @@ def embed_texts(texts: list) -> np.ndarray:
     response = hf_query(
         EMBEDDING_MODEL_NAME,
         {"inputs": texts, "options": {"wait_for_model": True}},
+        pipeline="feature-extraction",
     )
 
     vectors = []

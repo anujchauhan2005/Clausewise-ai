@@ -1,4 +1,4 @@
-"""
+﻿"""
 hf_client.py
 
 Small shared helper for calling the Hugging Face Inference API instead
@@ -36,7 +36,16 @@ MAX_RETRIES = 6
 RETRY_WAIT_SECONDS = 10
 
 
-def query(model: str, payload: dict) -> dict:
+def query(model: str, payload: dict, pipeline: str = None) -> dict:
+    """
+    pipeline: optional, e.g. "feature-extraction". Needed for models like
+    sentence-transformers embeddings models, where the router's default
+    pipeline for that model (sentence-similarity) expects different
+    input than what we want (raw embeddings) - confirmed by a real error:
+    "SentenceSimilarityPipeline.__call__() missing 1 required positional
+    argument: 'sentences'". Hitting /pipeline/{pipeline}/{model} instead
+    forces the specific pipeline we actually want.
+    """
     if not HF_API_TOKEN:
         raise RuntimeError(
             "HF_API_TOKEN is not set. Add it as an environment variable "
@@ -44,7 +53,11 @@ def query(model: str, payload: dict) -> dict:
             "'Read' access is enough)."
         )
 
-    url = HF_API_URL.format(model=model)
+    if pipeline:
+        url = f"https://router.huggingface.co/hf-inference/pipeline/{pipeline}/{model}"
+    else:
+        url = HF_API_URL.format(model=model)
+
     headers = {"Authorization": f"Bearer {HF_API_TOKEN}"}
 
     last_error_body = None
