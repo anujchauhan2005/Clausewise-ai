@@ -5,12 +5,16 @@ Just the search part - given a doc_id and a question, pulls the most
 relevant chunks back out of the FAISS index built in ingest.py. Kept
 this dumb and simple on purpose, all the "what do we do with these
 chunks" logic lives in qa.py.
+
+NOTE (updated): the query embedding used to come from the same local
+sentence-transformers model as ingest.py. Now goes through the same HF
+Inference API call (embed_texts) so there's no local model load at all
+for the RAG pipeline. See ingest.py / hf_client.py.
 """
 
-import numpy as np
 import faiss
 
-from app.rag.ingest import get_doc_index, _get_embedding_model
+from app.rag.ingest import get_doc_index, embed_texts
 
 
 def retrieve_relevant_chunks(doc_id: str, query: str, top_k: int = 4) -> list:
@@ -19,11 +23,10 @@ def retrieve_relevant_chunks(doc_id: str, query: str, top_k: int = 4) -> list:
         # doc hasn't been ingested (or was ingested under a different id)
         return []
 
-    model = _get_embedding_model()
     index = doc_data["index"]
     chunks = doc_data["chunks"]
 
-    query_embedding = model.encode([query]).astype("float32")
+    query_embedding = embed_texts([query])
     faiss.normalize_L2(query_embedding)
 
     # don't ask for more results than there actually are chunks, faiss
