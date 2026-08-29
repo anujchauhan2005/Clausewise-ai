@@ -1,17 +1,19 @@
 # 📜 ClauseWise — Legal Document Intelligence System
 
-**Turns dense legal/financial contracts into plain-English insights, automatically.**                               
+**Turns dense legal/financial contracts into plain-English insights, automatically.**
 
-ClauseWise takes a contract (loan agreement, employment contract, NDA, lease, etc.) and:
-- 🏷️ **Classifies every clause** into categories (Termination, Liability, Payment Terms, Confidentiality, etc.) using zero-shot NLP classification
-- 🔍 **Extracts key entities** — money amounts, dates, durations, parties — using Named Entity Recognition
-- ⚠️ **Flags risky/unusual clauses** (e.g. unlimited liability, unilateral termination, auto-renewal traps)
-- 📝 **Summarizes the whole document** in plain English using an abstractive summarization model
-- 💬 **Answers questions about the document** using Retrieval-Augmented Generation (RAG)       
+Upload a contract — a loan agreement, employment contract, NDA, lease, whatever — and ClauseWise reads it like a junior associate would: it classifies every clause, pulls out the key facts, flags anything unusual, summarizes the whole thing in plain English, and lets you ask follow-up questions about it.
 
-Built to demonstrate applied NLP across the full stack — not just a single Jupyter notebook model.
+## 🔗 Live Demo
 
-![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python&logoColor=white)
+| | |
+|---|---|
+| **Frontend (try it here)** | [clausewise-ai-legal9.streamlit.app](https://clausewise-ai-legal9.streamlit.app/) |
+| **Backend API docs** | [clausewise-backend-fzmr.onrender.com/docs](https://clausewise-backend-fzmr.onrender.com/docs) |
+
+> ⏳ Both are on free hosting tiers, so the backend spins down after inactivity — the first request after a while can take 30–60 seconds to wake up. Totally normal, just give it a moment.
+
+![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688?logo=fastapi&logoColor=white)
 ![Streamlit](https://img.shields.io/badge/Streamlit-Frontend-FF4B4B?logo=streamlit&logoColor=white)
 ![FAISS](https://img.shields.io/badge/FAISS-Vector%20Search-purple)
@@ -19,46 +21,77 @@ Built to demonstrate applied NLP across the full stack — not just a single Jup
 
 ---
 
-## Why this project
+## What it actually does
 
-Legal/financial document review is slow, expensive, and error-prone. Startups (Ironclad, Kira Systems, Luminance) have built entire companies around exactly this problem. This project reproduces the core NLP pipeline behind that category of product, end-to-end and evaluated — not just a demo notebook.
+1. **🏷️ Classifies every clause** — Termination, Liability, Payment Terms, Confidentiality, and 6 other categories — using zero-shot NLP classification (no training data needed).
+2. **🔍 Extracts key entities** — money amounts, dates, durations, and the parties involved — using Named Entity Recognition.
+3. **⚠️ Flags risky clauses** — unlimited liability, unilateral termination rights, auto-renewal traps — using a rule-based lexicon weighted by clause category.
+4. **📝 Summarizes the whole document** in plain English using abstractive summarization.
+5. **💬 Answers questions about the document** — "who are the parties?", "what's the termination notice period?" — using Retrieval-Augmented Generation (RAG).
+
+Built to show applied NLP across a full stack — a real backend/frontend split, a genuine evaluation framework, and an actually-deployed, publicly usable app — not a single Jupyter notebook.
 
 ---
 
 ## 🏗️ Architecture
 
 ```
-                    ┌──────────────┐
-                    │   Frontend    │  Streamlit UI
-                    │ (frontend/)   │
-                    └──────┬───────┘
-                           │ HTTP
-                    ┌──────▼───────┐
-                    │   FastAPI     │  backend/app/main.py
-                    │   Backend     │
-                    └──┬─────┬─────┘
-        ┌──────────────┘     └──────────────┐
-┌───────▼────────┐                  ┌────────▼────────┐
-│  NLP Pipeline   │                  │   RAG Q&A        │
-│  ─────────────  │                  │  ─────────────   │
-│  • NER          │                  │  • chunk + embed │
-│  • Classifier   │                  │  • FAISS search  │
-│  • Summarizer   │                  │  • LLM answer     │
-│  • Risk Flagger │                  └──────────────────┘
-└─────────────────┘
+                    ┌───────────────┐
+                    │   Frontend     │  Streamlit UI
+                    │ (Streamlit     │  → Streamlit Community Cloud
+                    │  Cloud)        │
+                    └───────┬────────┘
+                            │ HTTPS
+                    ┌───────▼────────┐
+                    │   FastAPI       │  backend/app/main.py
+                    │   Backend       │  → Render (free tier)
+                    └──┬─────────┬────┘
+        ┌──────────────┘         └──────────────┐
+┌───────▼─────────┐                    ┌─────────▼─────────┐
+│  NLP Pipeline     │                   │   RAG Q&A          │
+│  ──────────────   │                   │  ──────────────    │
+│  • NER (spaCy,     │                  │  • chunk + embed    │
+│    runs locally)   │                  │    (via HF API)     │
+│  • Classification  │──── HF ─────►    │  • FAISS search     │
+│  • Summarization    │  Inference      │    (runs locally)   │
+│  • Risk Flagger    │   API            │  • Groq LLM answer   │
+│    (rule-based,     │                  └─────────────────────┘
+│    runs locally)    │
+└─────────────────────┘
 ```
+
+**Why it's split this way:** the backend runs on Render's free tier, which caps out at 512MB RAM. Loading heavy transformer models (bart-large-mnli, distilbart, sentence-transformers) directly into that process was enough to OOM-crash it the moment a real request came in. The fix was to offload every heavy model call — clause classification, summarization, and embeddings — to the **Hugging Face Inference API**, so the actual neural network forward passes happen on HF's infrastructure, not on the 512MB box. The backend itself only ever holds spaCy (lightweight) and FAISS (an in-memory index, not a model) in memory, plus a handful of HTTP client libraries. No `torch` or `transformers` needed locally at all anymore.
 
 ---
 
-## 🧠 NLP Techniques Used
+## 🧠 Techniques & Where They Run
 
-| Module | Technique | Model |
+| Module | Technique | Model | Runs on |
+|---|---|---|---|
+| Entity Extraction | NER + regex for money/dates/duration | spaCy `en_core_web_sm` | Backend (local — small enough to be safe) |
+| Clause Classification | Zero-shot text classification | `valhalla/distilbart-mnli-12-3` | Hugging Face Inference API |
+| Summarization | Abstractive summarization | `sshleifer/distilbart-cnn-12-6` | Hugging Face Inference API |
+| Embeddings (for RAG) | Sentence embeddings | `sentence-transformers/all-MiniLM-L6-v2` | Hugging Face Inference API |
+| Risk Flagging | Rule-based lexicon + category-weighted scoring | Custom | Backend (local — no model needed) |
+| Vector Search | Cosine similarity via inner product | FAISS `IndexFlatIP` | Backend (local — just math, no model) |
+| Document Q&A | Retrieval-Augmented Generation | `openai/gpt-oss-20b` | Groq API |
+
+---
+
+## 🚀 Tech Stack & Hosting
+
+| Layer | Tech | Hosted on |
 |---|---|---|
-| Entity Extraction | Named Entity Recognition + regex for money/dates/duration | spaCy `en_core_web_sm` |
-| Clause Classification | Zero-shot text classification | `facebook/bart-large-mnli` |
-| Summarization | Abstractive summarization | `sshleifer/distilbart-cnn-12-6` |
-| Risk Flagging | Rule-based lexicon + category-weighted confidence scoring | Custom |
-| Document Q&A | Retrieval-Augmented Generation | `sentence-transformers/all-MiniLM-L6-v2` + FAISS + Groq LLM |
+| Frontend | Streamlit | **Streamlit Community Cloud** (free) |
+| Backend API | FastAPI + Uvicorn | **Render** (free web service) |
+| NLP inference (classification, summarization, embeddings) | Hugging Face Inference Providers (`router.huggingface.co`) | Hugging Face (free tier, token-based) |
+| LLM for Q&A | Groq (`openai/gpt-oss-20b`) | Groq API (free tier) |
+| Vector store | FAISS (in-memory, per-document) | Runs inside the Render backend |
+| Local NLP | spaCy | Runs inside the Render backend |
+
+**Why this combination:** it's the cheapest possible way to run a real multi-model NLP pipeline without paying for GPU hosting anywhere. Every piece — Render, Streamlit Cloud, the HF Inference API, Groq — has a usable free tier, and none of them require a credit card to get started. The tradeoff is cold-start latency (spinning up after inactivity) and occasional API rate limits, which is a fair trade for a $0/month portfolio deployment.
+
+> **Note on Hugging Face's API:** Hugging Face migrated their serverless inference from `api-inference.huggingface.co` to a new `router.huggingface.co`-based "Inference Providers" system in 2025/2026, with a different URL structure and slightly different response shapes per task. `backend/app/nlp/hf_client.py` is written against the current router API.
 
 ---
 
@@ -82,7 +115,7 @@ Ran against a hand-labeled set of 20 clauses (10 categories) and 3 reference sum
 | ROUGE-2 | 0.14 |
 | ROUGE-L | 0.31 |
 
-Per-class classification performance was strongest on structurally distinctive clauses (Termination, Governing Law, Dispute Resolution — all F1 1.00) and weakest where categories semantically overlap, e.g. **Force Majeure vs. Liability** ("liable for delays" reads as both). This is the expected failure mode of zero-shot classification without domain fine-tuning, and is the motivation for the LegalBERT fine-tuning item in the roadmap below.
+Classification was strongest on structurally distinctive clauses (Termination, Governing Law, Dispute Resolution — all F1 1.00) and weakest where categories semantically overlap, e.g. **Force Majeure vs. Liability** ("liable for delays" reads as both). That's the expected failure mode of zero-shot classification without domain fine-tuning — see the LegalBERT fine-tuning item in the roadmap below.
 
 Reproduce this yourself:
 ```bash
@@ -93,7 +126,7 @@ python evaluate.py
 
 ---
 
-## 🚀 Setup
+## 🛠️ Running It Locally
 
 ### 1. Backend
 
@@ -106,17 +139,21 @@ venv\Scripts\Activate.ps1        # Windows PowerShell
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm
 
-copy .env.example .env           # add your GROQ_API_KEY (free tier at console.groq.com)
+copy .env.example .env
+```
+
+Fill in `.env` with:
+```
+HF_API_TOKEN=your_huggingface_token      # free "Read" token from huggingface.co/settings/tokens
+GROQ_API_KEY=your_groq_key               # free tier at console.groq.com
+```
+
+```bash
 uvicorn app.main:app --reload
 ```
 Backend: `http://localhost:8000` · Docs: `http://localhost:8000/docs`
 
-> **First run downloads ~1.6GB of models** from Hugging Face (bart-large-mnli + distilbart). This only happens once — after that they're cached locally and load instantly. If you'd rather see the download progress directly instead of waiting through the Streamlit UI, warm the cache first:
-> ```bash
-> python -c "from transformers import pipeline; pipeline('zero-shot-classification', model='facebook/bart-large-mnli'); pipeline('summarization', model='sshleifer/distilbart-cnn-12-6')"
-> ```
-
-> **If you have TensorFlow installed** on the same environment, `transformers` may try to load it and crash with a protobuf version error — this project only uses PyTorch. `app/main.py` already sets `USE_TF=0` / `USE_FLAX=0` to avoid this, but if you hit it while running `eval/evaluate.py` directly, set it manually first: `$env:USE_TF="0"` (PowerShell) or `export USE_TF=0` (Mac/Linux).
+> No local model downloads needed — classification, summarization, and embeddings all call the Hugging Face Inference API instead of running on your machine. The first call to any given model may take a few seconds while it "wakes up" on HF's side; subsequent calls are fast.
 
 ### 2. Frontend
 
@@ -129,11 +166,28 @@ streamlit run app.py
 ```
 Frontend: `http://localhost:8501`
 
-### 3. Try it without the UI
+By default the frontend points at `http://localhost:8000`. To point it at the deployed backend instead, set a `BACKEND_URL` environment variable (this is exactly how the deployed frontend on Streamlit Cloud is configured, via a secret).
+
+### 3. Try it without any UI
 
 ```bash
 curl -X POST http://localhost:8000/analyze -F "file=@sample_data/sample_contract.txt"
 ```
+
+---
+
+## ☁️ How the Deployment Actually Works
+
+**Backend → Render**
+- Free "Web Service" plan, deployed straight from the GitHub repo (`backend/` as the root).
+- Environment variables set in Render's dashboard: `HF_API_TOKEN`, `GROQ_API_KEY`, `PYTHON_VERSION=3.11.9`.
+- Heavy NLP imports inside `routes.py` are lazy (imported inside each endpoint function, not at module load time), so the server binds to its port immediately on startup instead of timing out while loading libraries.
+
+**Frontend → Streamlit Community Cloud**
+- Deployed directly from the same GitHub repo, with `frontend/app.py` as the entry point.
+- The backend's Render URL is passed in via a `BACKEND_URL` secret in Streamlit Cloud's app settings — the code itself never hardcodes which backend to talk to.
+
+**Why not Hugging Face Spaces for the frontend?** HF Spaces changed its pricing during this project's development — Gradio and Docker Spaces now require a paid plan for personal accounts, with only static (HTML/JS) Spaces free. Since this app needs a live Python backend, Render + Streamlit Community Cloud ended up being the actually-free path.
 
 ---
 
@@ -145,13 +199,14 @@ legal-doc-intelligence/
 │   ├── app/
 │   │   ├── main.py
 │   │   ├── nlp/
-│   │   │   ├── ner.py              # entity + key-term extraction
-│   │   │   ├── classifier.py       # zero-shot clause classification
-│   │   │   ├── summarizer.py       # abstractive summarization
-│   │   │   └── risk_flagger.py     # rule-based risk detection
+│   │   │   ├── hf_client.py        # shared Hugging Face Inference API helper
+│   │   │   ├── ner.py              # entity + key-term extraction (local spaCy)
+│   │   │   ├── classifier.py       # zero-shot clause classification (via HF API)
+│   │   │   ├── summarizer.py       # abstractive summarization (via HF API)
+│   │   │   └── risk_flagger.py     # rule-based risk detection (local)
 │   │   ├── rag/
-│   │   │   ├── ingest.py           # chunk + embed document (FAISS)
-│   │   │   ├── retriever.py        # vector similarity search
+│   │   │   ├── ingest.py           # chunk + embed document (via HF API) + FAISS index
+│   │   │   ├── retriever.py        # vector similarity search (local FAISS)
 │   │   │   └── qa.py               # RAG question-answering (Groq)
 │   │   └── api/
 │   │       └── routes.py           # /analyze, /ask, /clauses, /risks endpoints
@@ -177,8 +232,8 @@ legal-doc-intelligence/
 - **Real backend/frontend separation** — a FastAPI service any client could call, not a single monolithic script.
 - **A genuine evaluation framework** — actual accuracy/F1/ROUGE numbers against a hand-labeled dataset, not just "it works on my machine."
 - **RAG with a real vector index (FAISS)** and a fallback mode (extractive answers) when no LLM API key is configured, so the project is demoable without requiring anyone to sign up for anything.
-- **Honest, documented limitations** — the eval results above call out exactly where zero-shot classification breaks down and why, which is a stronger signal than pretending the model is perfect.
-- **Deployed and publicly usable**, not just code that "runs on my machine."
+- **Solved a genuine production constraint** — free-tier RAM limits forced a real architectural decision (offload inference to hosted APIs instead of running models locally), which is exactly the kind of tradeoff real deployments have to make.
+- **Deployed and publicly usable** — both frontend and backend are live, not just code that "runs on my machine."
 
 ---
 
@@ -187,7 +242,7 @@ legal-doc-intelligence/
 - [ ] Fine-tune a dedicated clause classifier (LegalBERT) instead of zero-shot — should directly address the Force Majeure / Liability confusion seen in evaluation
 - [ ] Add PDF/DOCX ingestion (currently plain text)
 - [ ] Add clause-level diffing between two versions of a contract
-- [ ] Deploy backend + frontend publicly (Render/HF Spaces)
+- [ ] Persist the FAISS index (currently in-memory, resets on backend restart)
 - [ ] Wire `eval/evaluate.py` into CI so classification/summarization regressions get caught automatically
 
 ## 👤 Author
